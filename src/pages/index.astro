@@ -1,0 +1,29 @@
+---
+import Button from '@/components/Button'
+import Layout from '@/layouts/Layout.astro'
+---
+
+<Layout>
+  <div
+    class="bg-slate-1 mx-auto mt-8 max-w-md rounded-xl p-8 text-center shadow"
+  >
+    <h1 class="text-slate-12 mb-6 text-2xl font-bold">
+      Stickerify: Add Sticker Contour to Your Images
+    </h1>
+    <form class="flex flex-col items-center gap-6">
+      <label
+        for="image-upload"
+        class="bg-slate-3 hover:bg-slate-4 text-slate-12 cursor-pointer rounded-lg px-6 py-3 font-medium transition"
+      >
+        Upload Image
+        <input type="file" id="image-upload" accept="image/*" class="hidden" />
+      </label>
+      <div
+        class="border-slate-6 bg-slate-2 flex h-52 w-52 items-center justify-center overflow-hidden rounded-xl border-2 border-dashed"
+      >
+        <span class="text-slate-9 text-base">No image selected</span>
+      </div>
+      <Button>Add Sticker Contour</Button>
+    </form>
+  </div>
+</Layout>
