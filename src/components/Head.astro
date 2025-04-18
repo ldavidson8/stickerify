@@ -1,0 +1,36 @@
+---
+import { Font } from 'astro:assets'
+
+const { title, description } = Astro.props
+---
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="generator" content={Astro.generator} />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <script is:inline>
+    const theme = (() => {
+      const storedTheme = localStorage.getItem('theme')
+      if (storedTheme === 'light' || storedTheme === 'dark') {
+        return storedTheme
+      }
+      // If no theme stored, check system preference
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark'
+      }
+      return 'light' // Default to light if no preference or storage
+    })()
+
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark-theme')
+    } else {
+      // No class needed for light theme, ensure dark is removed if present
+      document.documentElement.classList.remove('dark-theme')
+    }
+  </script>
+  <Font cssVariable="--font-pretendard" preload />
+  <Font cssVariable="--font-roboto-mono" preload />
+</head>

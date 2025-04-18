@@ -1,35 +1,21 @@
 ---
-import '@/styles/app.css';
-const { title, description } = Astro.props;
----
+import '@/styles/app.css'
 
+import Footer from '@/components/Footer.astro'
+import Header from '@/components/Header.astro'
+import Head from '@/components/Head.astro'
+---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<script>
-			// Check for prefers-color-scheme: dark and apply .dark-theme to html
-			if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-				document.documentElement.classList.add('dark-theme');
-			}
+  <Head title="Stickerify" description="Turn your images into stickers" />
+  <body>
+    <div class="isolate grid min-h-dvh grid-rows-[auto_1fr_auto]">
+      <Header />
+      <slot />
+      <Footer />
+    </div>
 
-			// Listen for changes to the prefers-color-scheme media query
-			window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-				if (e.matches) {
-					document.documentElement.classList.add('dark-theme');
-				} else {
-					document.documentElement.classList.remove('dark-theme');
-				}
-			});
-		</script>
-	</head>
-	<body>
-		<slot />
-	</body>
+    <script type="module" src="/src/utils/themeObserver.ts"></script>
+  </body>
 </html>

@@ -1,84 +1,20 @@
 @import 'tailwindcss';
+@import '@radix-ui/colors/slate.css';
+@import '@radix-ui/colors/slate-dark.css';
+@import '@radix-ui/colors/blue.css';
+@import '@radix-ui/colors/blue-dark.css';
+@import '@radix-ui/colors/green.css';
+@import '@radix-ui/colors/green-dark.css';
+@import '@radix-ui/colors/red.css';
+@import '@radix-ui/colors/red-dark.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@layer base {
-  .light,
-  .light-theme,
-  :root {
-    --slate-1: #fcfcfd;
-    --slate-2: #f9f9fb;
-    --slate-3: #f0f0f3;
-    --slate-4: #e8e8ec;
-    --slate-5: #e0e1e6;
-    --slate-6: #d9d9e0;
-    --slate-7: #cdced6;
-    --slate-8: #b9bbc6;
-    --slate-9: #8b8d98;
-    --slate-10: #80838d;
-    --slate-11: #60646c;
-    --slate-12: #1c2024;
-  }
-
-  @supports (color: color(display-p3 1 1 1)) {
-    @media (color-gamut: p3) {
-      .light,
-      .light-theme,
-      :root {
-        --slate-1: color(display-p3 0.988 0.988 0.992);
-        --slate-2: color(display-p3 0.976 0.976 0.984);
-        --slate-3: color(display-p3 0.94 0.941 0.953);
-        --slate-4: color(display-p3 0.908 0.909 0.925);
-        --slate-5: color(display-p3 0.88 0.881 0.901);
-        --slate-6: color(display-p3 0.85 0.852 0.876);
-        --slate-7: color(display-p3 0.805 0.808 0.838);
-        --slate-8: color(display-p3 0.727 0.733 0.773);
-        --slate-9: color(display-p3 0.547 0.553 0.592);
-        --slate-10: color(display-p3 0.503 0.512 0.549);
-        --slate-11: color(display-p3 0.379 0.392 0.421);
-        --slate-12: color(display-p3 0.113 0.125 0.14);
-      }
-    }
-  }
-
-  .dark,
-  .dark-theme {
-    --slate-1: #111113;
-    --slate-2: #18191b;
-    --slate-3: #212225;
-    --slate-4: #272a2d;
-    --slate-5: #2e3135;
-    --slate-6: #363a3f;
-    --slate-7: #43484e;
-    --slate-8: #5a6169;
-    --slate-9: #696e77;
-    --slate-10: #777b84;
-    --slate-11: #b0b4ba;
-    --slate-12: #edeef0;
-  }
-
-  @supports (color: color(display-p3 1 1 1)) {
-    @media (color-gamut: p3) {
-      .dark,
-      .dark-theme {
-        --slate-1: color(display-p3 0.067 0.067 0.074);
-        --slate-2: color(display-p3 0.095 0.098 0.105);
-        --slate-3: color(display-p3 0.13 0.135 0.145);
-        --slate-4: color(display-p3 0.156 0.163 0.176);
-        --slate-5: color(display-p3 0.183 0.191 0.206);
-        --slate-6: color(display-p3 0.215 0.226 0.244);
-        --slate-7: color(display-p3 0.265 0.28 0.302);
-        --slate-8: color(display-p3 0.357 0.381 0.409);
-        --slate-9: color(display-p3 0.415 0.431 0.463);
-        --slate-10: color(display-p3 0.469 0.483 0.514);
-        --slate-11: color(display-p3 0.692 0.704 0.728);
-        --slate-12: color(display-p3 0.93 0.933 0.94);
-      }
-    }
-  }
-}
-
 @theme {
+  --font-sans: var(--font-pretendard), sans-serif;
+  --font-mono: 'Roboto Mono Variable', monospace;
+  --color-white: #fff;
+  --color-black: #000;
   --color-slate-1: var(--slate-1);
   --color-slate-2: var(--slate-2);
   --color-slate-3: var(--slate-3);
@@ -91,10 +27,34 @@
   --color-slate-10: var(--slate-10);
   --color-slate-11: var(--slate-11);
   --color-slate-12: var(--slate-12);
+  --color-blue-1: var(--blue-1);
+  --color-blue-2: var(--blue-2);
+  --color-blue-3: var(--blue-3);
+  --color-blue-4: var(--blue-4);
+  --color-blue-5: var(--blue-5);
+  --color-blue-6: var(--blue-6);
+  --color-blue-7: var(--blue-7);
+  --color-blue-8: var(--blue-8);
+  --color-blue-9: var(--blue-9);
+  --color-blue-10: var(--blue-10);
+  --color-blue-11: var(--blue-11);
+  --color-blue-12: var(--blue-12);
+  --color-green-1: var(--green-1);
+  --color-green-2: var(--green-2);
+  --color-green-3: var(--green-3);
+  --color-green-4: var(--green-4);
+  --color-green-5: var(--green-5);
+  --color-green-6: var(--green-6);
+  --color-green-7: var(--green-7);
+  --color-green-8: var(--green-8);
+  --color-green-9: var(--green-9);
+  --color-green-10: var(--green-10);
+  --color-green-11: var(--green-11);
+  --color-green-12: var(--green-12);
 }
 
 @layer base {
   body {
-    @apply bg-slate-1 text-slate-12;
+    @apply dark:bg-slate-1 bg-slate-1 text-slate-12;
   }
 }

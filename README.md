@@ -1,48 +1,94 @@
-# Astro Starter Kit: Basics
+# Stickerify
 
-```sh
-pnpm create astro@latest -- --template basics
+Stickerify is a web application that lets you upload an image and automatically adds a “sticker” style contour around it. Built with [Astro](https://astro.build/) and deployed on Cloudflare Workers, it provides a fast, responsive UI and client‑side processing for sticker contour generation.
+
+## Features
+
+- Upload any image (`png`, `jpg`, `webp`, etc.)
+- Generate a customizable sticker contour
+- Download the processed image
+- Light & dark theme support
+- Responsive design for all screen sizes
+
+## Tech Stack
+
+- Framework: [Astro](https://astro.build/)
+- UI Components: React + [@base-ui-components/react](https://www.npmjs.com/package/@base-ui-components/react)
+- Styles: Tailwind CSS
+- Cloudflare Workers for hosting
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js ≥16
+- `pnpm` (or `npm` / `yarn`)
+- A Cloudflare account & API token (for deployment)
+
+### Installation
+
+```bash
+pnpm install
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/basics)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/basics/devcontainer.json)
+### Development
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Runs the local dev server with Astro:
 
-![just-the-basics](https://github.com/withastro/astro/assets/2244813/a0a5533c-a856-4198-8470-2d67b1d7c554)
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src/
-│   ├── layouts/
-│   │   └── Layout.astro
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+pnpm run dev
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+Open your browser at `http://localhost:4321` to view the app.
 
-## 🧞 Commands
+### Build
 
-All commands are run from the root of the project, from a terminal:
+Generate a production build:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
+```bash
+pnpm run build
+```
 
-## 👀 Want to learn more?
+### Preview
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Serve the production build locally:
+
+```bash
+pnpm run preview
+```
+
+### Deploy
+
+Deploy to Cloudflare Workers:
+
+```bash
+pnpm run deploy
+```
+
+> For a dry‐run deploy (no production change), use:
+>
+> ```bash
+> pnpm run check
+> ```
+
+## Usage
+
+1. Open the app in your browser.
+2. Click **Upload Image** and select a file.
+3. Click **Add Sticker Contour**.
+4. Download the resulting image.
+
+## Contributing
+
+1. Fork the repo.
+2. Create a feature branch: `git checkout -b feature/YourFeature`.
+3. Commit your changes: `git commit -m 'feat: Add your feature'`.
+4. Push to the branch: `git push origin feature/YourFeature`.
+5. Open a Pull Request.
+
+Please follow the existing code style and run `pnpm run format` before submitting.
+
+## License
+
+MIT © Stickerify Contributors  
+See [LICENSE](LICENSE) for details.
