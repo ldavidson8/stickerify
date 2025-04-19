@@ -15,10 +15,10 @@ const themes = [
   {
     value: 'system',
     label: 'System',
-    icon: <TablerDeviceDesktop className="size-5" />,
+    icon: <TablerDeviceDesktop className="size-4" />,
   },
-  { value: 'light', label: 'Light', icon: <TablerSun className="size-5" /> },
-  { value: 'dark', label: 'Dark', icon: <TablerMoon className="size-5" /> },
+  { value: 'light', label: 'Light', icon: <TablerSun className="size-4" /> },
+  { value: 'dark', label: 'Dark', icon: <TablerMoon className="size-4" /> },
 ]
 
 export default function Select() {
@@ -40,7 +40,7 @@ export default function Select() {
       value={currentPreference}
       onValueChange={handleValueChange}
     >
-      <SelectPrimitive.Trigger className="border-slate-3 text-slate-12 hover:bg-slate-2 active:bg-slate-2 data-[popup-open]:bg-slate-2 focus-visible:outline-blue-8 flex h-10 min-w-36 items-center justify-between gap-3 rounded-md border pr-3 pl-3.5 text-base select-none focus-visible:outline-2 focus-visible:-outline-offset-1">
+      <SelectPrimitive.Trigger className="border-slate-3 text-slate-12 hover:bg-slate-2 active:bg-slate-2 data-[popup-open]:bg-slate-2 focus-visible:outline-blue-8 flex h-10 min-w-36 items-center justify-between gap-3 rounded-md border pr-3 pl-3.5 text-sm select-none focus-visible:outline-2 focus-visible:-outline-offset-1">
         <span className="flex items-center">{currentThemeObject?.icon}</span>
         <SelectPrimitive.Value placeholder="Theme" />
         <SelectPrimitive.Icon className="flex">

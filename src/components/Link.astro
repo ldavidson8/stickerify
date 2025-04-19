@@ -1,0 +1,18 @@
+---
+import { cn } from '@/utils/twMerge'
+import type { HTMLAttributes } from 'astro/types'
+
+type Props = HTMLAttributes<'a'> & {
+  href: string
+  class?: string
+}
+
+const { href, class: className, ...props } = Astro.props
+
+const baseStyles =
+  'inline-flex gap-1 items-center justify-center rounded-md font-medium transition hover:underline'
+---
+
+<a href={href} class={cn(baseStyles, className)} {...props}>
+  <slot />
+</a>

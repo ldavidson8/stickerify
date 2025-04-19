@@ -11,12 +11,7 @@ interface BaseProps {
   size?: ButtonSize
 }
 
-type ButtonProps = BaseProps & HTMLAttributes<'button'>
-type AnchorProps = BaseProps &
-  HTMLAttributes<'a'> & {
-    href: string
-  }
-type Props = ButtonProps | AnchorProps
+type Props = BaseProps & HTMLAttributes<'button'>
 
 const {
   variant = 'primary',
@@ -24,8 +19,6 @@ const {
   class: className,
   ...props
 } = Astro.props
-
-const isLink = 'href' in props
 
 const baseStyles =
   'inline-flex whitespace-nowrap cursor-pointer items-center justify-center rounded-md font-medium transition-colors'
@@ -47,21 +40,10 @@ const sizes = {
 }
 ---
 
-{
-  isLink ? (
-    <a
-      class={cn(baseStyles, variants[variant], sizes[size], className)}
-      {...props}
-    >
-      <slot />
-    </a>
-  ) : (
-    <button
-      class={cn(baseStyles, variants[variant], sizes[size], className)}
-      {...props}
-    >
-      <slot name="icon" />
-      <slot />
-    </button>
-  )
-}
+<button
+  class={cn(baseStyles, variants[variant], sizes[size], className)}
+  {...props}
+>
+  <slot name="icon" />
+  <slot />
+</button>

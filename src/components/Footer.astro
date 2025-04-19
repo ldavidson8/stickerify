@@ -1,23 +1,31 @@
+---
+import Link from '@/components/Link.astro'
+import GithubLogo from '~icons/tabler/brand-github'
+import Coffee from '~icons/tabler/coffee'
+---
+
 <footer>
   <div class="flex w-full justify-center gap-5 p-4">
     <div class="flex w-full justify-between">
       <div>
         <p class="text-sm">
           Made by
-          <a href="https://github.com/ldavidson8" target="_blank">
+          <Link href="https://github.com/ldavidson8" target="_blank">
             ldavidson8
-          </a>
+            <GithubLogo />
+          </Link>
         </p>
       </div>
       <div>
-        <a
+        <Link
           href="https://buymeacoffee.com/ldavidson8"
           target="_blank"
           rel="noopener"
           class="text-sm"
         >
           Buy Me a Coffee
-        </a>
+          <Coffee />
+        </Link>
       </div>
     </div>
   </div>

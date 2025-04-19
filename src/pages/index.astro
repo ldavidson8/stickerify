@@ -5,40 +5,452 @@ import Layout from '@/layouts/Layout.astro'
 
 <Layout title="Stickerify" description="Add sticker contour to your images">
   <div
-    class="bg-slate-1 mx-auto mt-8 max-w-xl rounded-xl p-8 text-center shadow"
+    id="overlay"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 text-white backdrop-blur-sm"
+  >
+    <span class="text-2xl font-bold">Drop image anywhere</span>
+  </div>
+  <div
+    id="content-area"
+    class="bg-slate-1 relative mx-auto mt-8 flex max-w-xl flex-col items-center rounded-xl p-8 text-center shadow"
   >
     <h1
-      class="text-slate-12 mb-6 text-3xl font-bold tracking-wider text-balance"
+      class="text-slate-12 mb-6 text-2xl font-bold tracking-wider text-balance lg:text-3xl"
     >
       Stickerify: Turn Your Images into Stickers
     </h1>
-    <form class="flex flex-col items-center gap-6">
+    <div class="flex flex-col items-center gap-6">
       <label
         for="image-upload"
-        class="bg-slate-3 hover:bg-slate-4 text-slate-12 cursor-pointer rounded-lg px-6 py-3 font-medium transition"
+        class="bg-slate-3 text-slate-12 hover:bg-slate-4 inline-flex whitespace-nowrap cursor-pointer items-center justify-center rounded-md font-medium transition-colors h-9 px-4 py-2 text-sm"
       >
         Upload Image
-        <input type="file" id="image-upload" accept="image/*" class="hidden" />
+        <input
+          type="file"
+          id="image-upload"
+          accept="image/png, image/svg+xml"
+          class="hidden"
+        />
       </label>
       <div
-        class="border-slate-6 bg-slate-2 flex h-52 w-52 items-center justify-center overflow-hidden rounded-xl border-2 border-dashed"
+        id="preview-container"
+        class="border-slate-6 bg-slate-11 relative flex h-48 w-64 items-center justify-center overflow-hidden rounded-xl border-2 border-dashed"
       >
-        <span class="text-slate-9 text-base">No image selected</span>
+        <span id="preview-text" class="text-slate-9 text-base"
+          >No image selected</span
+        >
+        <img
+          id="preview-image"
+          src=""
+          alt="Image preview"
+          class="mx-auto hidden max-h-full max-w-full object-contain"
+          crossorigin="anonymous"
+        />
       </div>
-    </form>
-  </div>
-  <div class="grid max-w-xl grid-cols-3 place-content-center gap-4">
-    <Button variant="primary" size="sm"> Generate Sticker </Button>
-    <Button variant="primary" size="md"> Generate Sticker </Button>
-    <Button variant="primary" size="lg"> Generate Sticker </Button>
-    <Button variant="outline" size="sm">Add Sticker Contour</Button>
-    <Button variant="outline" size="md">Add Sticker Contour</Button>
-    <Button variant="outline" size="lg">Add Sticker Contour</Button>
-    <Button variant="secondary" size="sm">Add Sticker Contour</Button>
-    <Button variant="secondary" size="md">Add Sticker Contour</Button>
-    <Button variant="secondary" size="lg">Add Sticker Contour</Button>
-    <Button variant="success" size="sm">Add Sticker Contour</Button>
-    <Button variant="success" size="md">Add Sticker Contour</Button>
-    <Button variant="success" size="lg">Add Sticker Contour</Button>
+      <p class="text-slate-11 text-sm">
+        Tip: Use a transparent PNG or SVG for the best sticker results.
+      </p>
+
+      <Button id="generate-sticker" variant="primary" type="button">
+        Generate Sticker
+      </Button>
+    </div>
+
+    <div class="mt-8 w-full">
+      <h2 class="text-slate-12 mb-4 text-xl font-semibold">Result:</h2>
+      <canvas
+        id="result-canvas"
+        class="mx-auto hidden max-w-full rounded-lg bg-transparent shadow"
+      ></canvas>
+
+      <div
+        id="result-actions"
+        class="mt-4 hidden items-center justify-center gap-4"
+      >
+        <Button id="copy-svg-button" variant="outline" type="button">
+          Copy as SVG
+        </Button>
+      </div>
+    </div>
   </div>
 </Layout>
+
+<script>
+  const overlay = document.getElementById('overlay')
+  const fileInput = document.getElementById('image-upload') as HTMLInputElement
+  const previewContainer = document.getElementById('preview-container')
+  const previewText = document.getElementById('preview-text')
+  const previewImage = document.getElementById(
+    'preview-image',
+  ) as HTMLImageElement
+  const generateButton = document.getElementById('generate-sticker')
+  const resultCanvas = document.getElementById(
+    'result-canvas',
+  ) as HTMLCanvasElement
+  const resultActions = document.getElementById('result-actions')
+  const copySvgButton = document.getElementById('copy-svg-button')
+
+  let currentFile: File | null = null
+  let dragCounter = 0
+
+  function showOverlay() {
+    overlay?.classList.remove('hidden')
+    overlay?.classList.add('flex')
+  }
+
+  function hideOverlay() {
+    overlay?.classList.add('hidden')
+    overlay?.classList.remove('flex')
+  }
+
+  function showToast(detail: { title: string; description: string }) {
+    document.dispatchEvent(new CustomEvent('show-toast', { detail }))
+  }
+
+  function handleFile(file: File | null) {
+    if (!file) {
+      currentFile = null
+      previewImage.src = ''
+      previewImage.classList.add('hidden')
+      previewText?.classList.remove('hidden')
+      previewContainer?.classList.add(
+        'border-dashed',
+        'items-center',
+        'justify-center',
+      )
+      previewContainer?.classList.remove('p-2')
+      resultCanvas.style.display = 'none'
+      resultCanvas
+        .getContext('2d')
+        ?.clearRect(0, 0, resultCanvas.width, resultCanvas.height)
+      resultActions?.classList.add('hidden')
+      return
+    }
+
+    const validTypes = ['image/png', 'image/svg+xml']
+    if (!validTypes.includes(file.type)) {
+      showToast({
+        title: 'Invalid File Type',
+        description: 'Please upload a PNG or SVG image.',
+      })
+      currentFile = null
+      return
+    }
+
+    currentFile = file
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      if (previewImage && previewText && e.target?.result) {
+        previewImage.src = e.target.result as string
+        previewImage.onload = () => {
+          analyzeImageBrightness(previewImage)
+
+          previewImage.classList.remove('hidden')
+          previewText.classList.add('hidden')
+          previewContainer?.classList.remove(
+            'border-dashed',
+            'items-center',
+            'justify-center',
+          )
+          previewContainer?.classList.add('p-2')
+          resultCanvas.style.display = 'none'
+          resultCanvas
+            .getContext('2d')
+            ?.clearRect(0, 0, resultCanvas.width, resultCanvas.height)
+        }
+      }
+    }
+    reader.readAsDataURL(file)
+    console.log('File accepted:', file.name)
+  }
+
+  function analyzeImageBrightness(img: HTMLImageElement) {
+    const canvas = new OffscreenCanvas(50, 50)
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    ctx.drawImage(img, 0, 0, 50, 50)
+
+    const imageData = ctx.getImageData(0, 0, 50, 50)
+    const data = imageData.data
+
+    let totalBrightness = 0
+    let pixelsAnalyzed = 0
+
+    for (let i = 0; i < data.length; i += 16) {
+      if (data[i + 3] > 50) {
+        const brightness =
+          0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]
+
+        totalBrightness += brightness
+        pixelsAnalyzed++
+      }
+    }
+
+    const avgBrightness =
+      pixelsAnalyzed > 0 ? totalBrightness / pixelsAnalyzed : 127
+
+    if (previewContainer) {
+      previewContainer.classList.remove(
+        'bg-slate-1',
+        'bg-slate-11',
+        'bg-slate-12',
+      )
+
+      if (avgBrightness < 128) {
+        previewContainer.classList.add('bg-white')
+      } else {
+        previewContainer.classList.add('bg-black')
+      }
+    }
+
+    console.log(`Image brightness: ${avgBrightness}/255`)
+  }
+
+  async function generateSticker() {
+    if (!currentFile || !previewImage.src || !resultCanvas) {
+      showToast({
+        title: 'No Image',
+        description: 'Please upload an image first.',
+      })
+      return
+    }
+
+    const mainCtx = resultCanvas.getContext('2d', { willReadFrequently: true })
+    if (!mainCtx) {
+      showToast({
+        title: 'Error',
+        description: 'Could not get canvas context.',
+      })
+      return
+    }
+
+    const img = new Image()
+    img.onload = () => {
+      const contourWidth = 10
+      const canvasPadding = contourWidth * 2
+      const imgW = img.naturalWidth
+      const imgH = img.naturalHeight
+
+      resultCanvas.width = imgW + canvasPadding
+      resultCanvas.height = imgH + canvasPadding
+
+      const offscreenCanvas = new OffscreenCanvas(imgW, imgH)
+      const offCtx = offscreenCanvas.getContext('2d', {
+        willReadFrequently: true,
+      })
+      if (!offCtx) {
+        showToast({
+          title: 'Error',
+          description: 'Could not create offscreen canvas context.',
+        })
+        return
+      }
+
+      offCtx.drawImage(img, 0, 0)
+
+      const imageData = offCtx.getImageData(0, 0, imgW, imgH)
+      const data = imageData.data
+      const alphaThreshold = 10
+
+      mainCtx.clearRect(0, 0, resultCanvas.width, resultCanvas.height)
+      mainCtx.fillStyle = 'white'
+
+      for (let y = 0; y < imgH; y++) {
+        for (let x = 0; x < imgW; x++) {
+          const index = (y * imgW + x) * 4
+          const alpha = data[index + 3]
+
+          if (alpha > alphaThreshold) {
+            mainCtx.beginPath()
+            mainCtx.arc(
+              x + contourWidth,
+              y + contourWidth,
+              contourWidth,
+              0,
+              2 * Math.PI,
+            )
+            mainCtx.fill()
+          }
+        }
+      }
+
+      mainCtx.drawImage(img, contourWidth, contourWidth)
+
+      resultCanvas.style.display = 'block'
+      resultActions?.classList.remove('hidden')
+      console.log('Sticker generated with pixel manipulation.')
+    }
+    img.onerror = () => {
+      showToast({
+        title: 'Error',
+        description: 'Failed to load image for processing.',
+      })
+    }
+    img.src = previewImage.src
+  }
+
+  function triggerDownload(href: string, filename: string) {
+    const link = document.createElement('a')
+    link.download = filename
+    link.href = href
+    link.click()
+    link.remove()
+  }
+
+  copySvgButton?.addEventListener('click', async () => {
+    if (!resultCanvas || !copySvgButton) return
+
+    try {
+      const svgWidth = resultCanvas.width
+      const svgHeight = resultCanvas.height
+      const canvasDataUrl = resultCanvas.toDataURL('image/png')
+      const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}">
+        <image href="${canvasDataUrl}" width="${svgWidth}" height="${svgHeight}"/>
+      </svg>`
+
+      await navigator.clipboard.writeText(svgString)
+
+      const originalText = copySvgButton.textContent
+      copySvgButton.textContent = 'Copied!'
+      showToast({ title: 'Success', description: 'SVG copied to clipboard!' })
+
+      setTimeout(() => {
+        copySvgButton.textContent = originalText
+      }, 2000)
+    } catch (err) {
+      console.error('Error copying SVG:', err)
+      showToast({
+        title: 'Error',
+        description: 'Failed to copy SVG to clipboard.',
+      })
+    }
+  })
+
+  let downloadPngButton: HTMLButtonElement | null = null
+  let downloadSvgButton: HTMLButtonElement | null = null
+
+  function setupDownloadButtons() {
+    downloadPngButton = document.getElementById(
+      'download-png-button',
+    ) as HTMLButtonElement
+    downloadSvgButton = document.getElementById(
+      'download-svg-button',
+    ) as HTMLButtonElement
+
+    if (downloadPngButton) {
+      downloadPngButton.addEventListener('click', handleDownloadPng)
+    } else {
+      console.warn('Download PNG button not found')
+    }
+
+    if (downloadSvgButton) {
+      downloadSvgButton.addEventListener('click', handleDownloadSvg)
+    } else {
+      console.warn('Download SVG button not found')
+    }
+  }
+
+  setTimeout(setupDownloadButtons, 100)
+
+  function handleDownloadPng() {
+    if (!resultCanvas || !currentFile) return
+    const filename = currentFile.name.split('.')[0] + '-sticker.png'
+    const dataUrl = resultCanvas.toDataURL('image/png')
+    triggerDownload(dataUrl, filename)
+  }
+
+  function handleDownloadSvg() {
+    if (!resultCanvas || !currentFile) return
+
+    const svgWidth = resultCanvas.width
+    const svgHeight = resultCanvas.height
+    const canvasDataUrl = resultCanvas.toDataURL('image/png')
+    const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}" style="background: transparent;">
+      <image href="${canvasDataUrl}" width="${svgWidth}" height="${svgHeight}"/>
+    </svg>`
+
+    const blob = new Blob([svgString], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    const filename = currentFile.name.split('.')[0] + '-sticker.svg'
+    triggerDownload(url, filename)
+    URL.revokeObjectURL(url)
+  }
+
+  document.body.addEventListener(
+    'dragenter',
+    (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      dragCounter++
+      if (dragCounter === 1) {
+        showOverlay()
+      }
+    },
+    false,
+  )
+
+  document.body.addEventListener(
+    'dragover',
+    (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+    },
+    false,
+  )
+
+  document.body.addEventListener(
+    'dragleave',
+    (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      dragCounter--
+      if (dragCounter === 0) {
+        hideOverlay()
+      }
+    },
+    false,
+  )
+
+  document.body.addEventListener(
+    'drop',
+    (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      dragCounter = 0
+      hideOverlay()
+
+      const dt = e.dataTransfer
+      const files = dt?.files
+
+      if (files && files.length > 0) {
+        handleFile(files[0])
+        if (fileInput) {
+          try {
+            fileInput.files = files
+          } catch (err) {
+            console.warn('Could not assign dropped files to input:', err)
+          }
+        }
+      }
+    },
+    false,
+  )
+
+  fileInput?.addEventListener('change', (e) => {
+    const target = e.target as HTMLInputElement
+    if (target.files && target.files.length > 0) {
+      handleFile(target.files[0])
+    } else {
+      handleFile(null)
+    }
+  })
+
+  generateButton?.addEventListener('click', generateSticker)
+
+  if (previewContainer) {
+    previewContainer.classList.remove('bg-slate-11')
+    previewContainer.classList.add('bg-slate-1')
+  }
+</script>
