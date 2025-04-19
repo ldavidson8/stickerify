@@ -12,5 +12,7 @@
         "parser": "astro"
       }
     }
-  ]
+  ],
+  "tailwindAttributes": ["class", "className"],
+  "tailwindFunctions": ["cn", "clsx", "cva"]
 }
